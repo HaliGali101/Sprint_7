@@ -1,7 +1,5 @@
 package scooter;
 
-import io.qameta.allure.Description;
-import io.qameta.allure.Step;
 import io.restassured.response.ValidatableResponse;
 import scooter.pojo.Orders;
 
@@ -9,8 +7,6 @@ import static scooter.SetUp.baseSpec;
 
 public class OrdersMethods {
 
-    @Step
-    @Description("Создание заказа")
     public static ValidatableResponse postCreateOrders(Orders order) {
         return baseSpec
                 .header("Content-type", "application/json")
@@ -22,8 +18,6 @@ public class OrdersMethods {
                 .log().all();
     }
 
-    @Step
-    @Description("Получить заказ по его номеру")
     public static ValidatableResponse getOrderInfo(String track) {
         return baseSpec
                 .header("Content-type", "application/json")
@@ -35,8 +29,6 @@ public class OrdersMethods {
                 .log().all();
     }
 
-    @Step
-    @Description("Завершить заказ")
     public static ValidatableResponse finishOrder(String id) {
         return baseSpec
                 .header("Content-type", "application/json")
@@ -47,8 +39,6 @@ public class OrdersMethods {
                 .log().all();
     }
 
-    @Step
-    @Description("Принять заказ")
     public static void putOrdersAccept(String orderId, String courierId) {
         baseSpec
                 .header("Content-type", "application/json")
@@ -60,8 +50,6 @@ public class OrdersMethods {
                 .log().all();
     }
 
-    @Step
-    @Description("Получение списка заказов")
     public static ValidatableResponse getOrderList(String courierId) {
         return baseSpec
                 .header("Content-type", "application/json")

@@ -1,6 +1,5 @@
 package scooter;
 
-import io.qameta.allure.Description;
 import io.restassured.response.ValidatableResponse;
 import scooter.pojo.Courier;
 import scooter.pojo.CourierLogin;
@@ -9,7 +8,6 @@ import static scooter.SetUp.baseSpec;
 
 public class CourierMethods {
 
-    @Description("Создание курьера")
     public ValidatableResponse postCreateCourier(Courier courier) {
         return baseSpec
                 .header("Content-type", "application/json")
@@ -21,7 +19,6 @@ public class CourierMethods {
                 .log().all();
     }
 
-    @Description("Логин курьера в системе")
     public static ValidatableResponse postCourierLogin(CourierLogin courierLogin) {
         return baseSpec
                 .header("Content-type", "application/json")
@@ -33,7 +30,6 @@ public class CourierMethods {
                 .log().all();
     }
 
-    @Description("Удаление курьера")
     public static ValidatableResponse deleteCourier(String courierId) {
         return baseSpec
                 .header("Content-type", "application/json")

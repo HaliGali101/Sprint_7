@@ -1,31 +1,26 @@
 package scooter;
 
 import io.qameta.allure.Description;
+import io.qameta.allure.Step;
+import io.qameta.allure.junit4.DisplayName;
 import io.restassured.response.ValidatableResponse;
 import org.junit.After;
 import org.junit.Test;
 import scooter.pojo.Orders;
+import scooter.testData.ColorArrayData;
 import scooter.testData.OrdersData;
-
-import java.util.ArrayList;
 
 import static org.hamcrest.Matchers.*;
 
 public class OrderTests extends SetUp {
 
-    private final String blackColor = "BLACK";
-    private final String grayColor = "GRAY";
     private String track;
 
     @Test
-    @Description("Создание заказа.Чёрный цвет")
+    @DisplayName("Создание заказа.Чёрный цвет")
+    @Description("Создать заказ с чёрным цветом самоката")
     public void createOrderWithBlackColor() {
-        ArrayList<String> scooterColor = new ArrayList<>();
-        scooterColor.add(blackColor);
-
-        Orders order = OrdersData.getOrderData(scooterColor);
-
-        ValidatableResponse response = OrdersMethods.postCreateOrders(order)
+        ValidatableResponse response = createOrder("black")
                 .statusCode(201)
                 .assertThat().body("track", notNullValue());
 
@@ -33,14 +28,10 @@ public class OrderTests extends SetUp {
     }
 
     @Test
-    @Description("Создание заказа.Серый цвет")
+    @DisplayName("Создание заказа.Серый цвет")
+    @Description("Создать заказ с серым цветом самоката")
     public void createOrderWithGrayColor() {
-        ArrayList<String> scooterColor = new ArrayList<>();
-        scooterColor.add(grayColor);
-
-        Orders order = OrdersData.getOrderData(scooterColor);
-
-        ValidatableResponse response = OrdersMethods.postCreateOrders(order)
+        ValidatableResponse response = createOrder("gray")
                 .statusCode(201)
                 .assertThat().body("track", notNullValue());
 
@@ -48,15 +39,10 @@ public class OrderTests extends SetUp {
     }
 
     @Test
-    @Description("Создание заказа.Все цвета")
+    @DisplayName("Создание заказа.Любой цвет")
+    @Description("Создать заказ с чёрным или серым цветом самоката")
     public void createOrderWithAllColors() {
-        ArrayList<String> scooterColor = new ArrayList<>();
-        scooterColor.add(blackColor);
-        scooterColor.add(grayColor);
-
-        Orders order = OrdersData.getOrderData(scooterColor);
-
-        ValidatableResponse response = OrdersMethods.postCreateOrders(order)
+        ValidatableResponse response = createOrder("all")
                 .statusCode(201)
                 .assertThat().body("track", notNullValue());
 
@@ -64,13 +50,10 @@ public class OrderTests extends SetUp {
     }
 
     @Test
-    @Description("Создание заказа.Без цветов")
+    @DisplayName("Создание заказа.Без цвета")
+    @Description("Создать заказ без передачи цвета самоката")
     public void createOrderWithoutColors() {
-        ArrayList<String> scooterColor = new ArrayList<>();
-
-        Orders order = OrdersData.getOrderData(scooterColor);
-
-        ValidatableResponse response = OrdersMethods.postCreateOrders(order)
+        ValidatableResponse response = createOrder("null")
                 .statusCode(201)
                 .assertThat().body("track", notNullValue());
 
@@ -78,9 +61,20 @@ public class OrderTests extends SetUp {
     }
 
     @After
-    @Description("Создание заказа.Постусловие для теста.Завершить заказ")
+    @Description("Постусловие.Завершить заказ")
     public void cleanUp() {
-        String orderId = OrdersMethods.getOrderInfo(track).extract().path("order.id").toString();
+        finishOrder();
+    }
+
+    @Step("Создать заказ")
+    private ValidatableResponse createOrder(String colorConfig) {
+        Orders order = OrdersData.getOrderData(new ColorArrayData().getColorData(colorConfig));
+        return OrdersMethods.postCreateOrders(order);
+    }
+
+    @Step("Завершить заказ")
+    private void finishOrder() {
+        String orderId = OrdersMethods.getOrderInfo(track).statusCode(200).extract().path("order.id").toString();
         OrdersMethods.finishOrder(orderId);
     }
 

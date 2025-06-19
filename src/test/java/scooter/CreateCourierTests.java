@@ -1,7 +1,9 @@
 package scooter;
 
-import io.qameta.allure.Allure;
 import io.qameta.allure.Description;
+import io.qameta.allure.Step;
+import io.qameta.allure.junit4.DisplayName;
+import io.restassured.response.ValidatableResponse;
 import org.junit.After;
 import org.junit.Test;
 import scooter.pojo.Courier;
@@ -9,7 +11,6 @@ import scooter.pojo.CourierLogin;
 import scooter.testData.CourierData;
 
 import static org.hamcrest.Matchers.equalTo;
-import static scooter.CourierMethods.*;
 
 public class CreateCourierTests extends SetUp {
 
@@ -18,104 +19,110 @@ public class CreateCourierTests extends SetUp {
     private String courierId;
 
     @Test
-    @Description("Создание курьера.Успешное создание курьера")
+    @DisplayName("Создание курьера.Успешное создание курьера")
+    @Description("Создать курьера передав все параметры")
     public void createCourier() {
 
         courier = new CourierData().getCourierData("courierAllData");
 
-        Allure.step("Создать курьера", () -> {
-            new CourierMethods().postCreateCourier(courier)
-                    .statusCode(201)
-                    .assertThat().body("ok", equalTo(true));
-        });
+        postCreateCourier(courier)
+                .statusCode(201)
+                .assertThat().body("ok", equalTo(true));
 
         isCreated = true;
     }
 
     @Test
-    @Description("Создание курьера.Не передан логин")
+    @DisplayName("Создание курьера.Создание курьера без логина")
+    @Description("Создать курьера без логина")
     public void createCourierWithoutLogin() {
 
         courier = new CourierData().getCourierData("courierWithoutLogin");
 
-        Allure.step("Создать курьера без логина", () -> {
-            new CourierMethods().postCreateCourier(courier)
-                    .statusCode(400)
-                    .assertThat().body("code", equalTo(400))
-                    .assertThat().body("message", equalTo("Недостаточно данных для создания учетной записи"));
-        });
+        postCreateCourier(courier)
+                .statusCode(400)
+                .assertThat().body("code", equalTo(400))
+                .assertThat().body("message", equalTo("Недостаточно данных для создания учетной записи"));
 
         isCreated = false;
     }
 
     @Test
-    @Description("Создание курьера.Не передан пароль")
+    @DisplayName("Создание курьера.Создание курьера без пароля")
+    @Description("Создать курьера без пароля")
     public void createCourierWithoutPassword() {
 
         courier = new CourierData().getCourierData("courierWithoutPassword");
 
-        Allure.step("Создать курьера без пароля", () -> {
-            new CourierMethods().postCreateCourier(courier)
-                    .statusCode(400)
-                    .assertThat().body("code", equalTo(400))
-                    .assertThat().body("message", equalTo("Недостаточно данных для создания учетной записи"));
-        });
+        postCreateCourier(courier)
+                .statusCode(400)
+                .assertThat().body("code", equalTo(400))
+                .assertThat().body("message", equalTo("Недостаточно данных для создания учетной записи"));
 
         isCreated = false;
     }
 
     @Test
-    @Description("Создание курьера.Не передано имя")
+    @DisplayName("Создание курьера.Создание курьера без имени")
+    @Description("Создать курьера без имени")
     public void createCourierWithoutFirstName() {
 
         courier = new CourierData().getCourierData("courierWithoutFirstName");
 
-        Allure.step("Создать курьера без имени", () -> {
-            new CourierMethods().postCreateCourier(courier)
-                    .statusCode(201)
-                    .assertThat().body("ok", equalTo(true));
-        });
+        postCreateCourier(courier)
+                .statusCode(201)
+                .assertThat().body("ok", equalTo(true));
 
         isCreated = true;
     }
 
     @Test()
-    @Description("Создание курьера.Дубликат курьера")
+    @DisplayName("Создание курьера.Дубликат")
+    @Description("Создать второго курьера с одинаковыми атрибутами")
     public void createCourierDuplicate() {
 
         courier = new CourierData().getCourierData("courierWithoutFirstName");
 
-        Allure.step("Создать курьера", () -> {
-            new CourierMethods().postCreateCourier(courier)
-                    .statusCode(201)
-                    .assertThat().body("ok", equalTo(true));
-        });
+        postCreateCourier(courier)
+                .statusCode(201)
+                .assertThat().body("ok", equalTo(true));
 
-        Allure.step("Создать дубликат курьера", () -> {
-            new CourierMethods().postCreateCourier(courier)
-                    .statusCode(409)
-                    .assertThat().body("message", equalTo("Этот логин уже используется"));
-        });
+        new CourierMethods().postCreateCourier(courier)
+                .statusCode(409)
+                .assertThat().body("message", equalTo("Этот логин уже используется"));
 
         isCreated = true;
     }
 
     @After
-    @Description("Постусловие.Удаление курьера")
+    @DisplayName("Постусловие")
     public void cleanUp() {
-        Allure.step("Постусловие.Удалить курьера", () -> {
-            if (isCreated) {
-                CourierLogin getCourier = new CourierLogin(courier.getLogin(), courier.getPassword());
+        if (isCreated) {
+            CourierLogin courierLogin = new CourierLogin(courier.getLogin(), courier.getPassword());
 
-                Allure.step("Получить id курьера", () -> {
-                    courierId = postCourierLogin(getCourier).extract().path("id").toString();
-                });
+            courierId = getCourierId(courierLogin)
+                    .statusCode(200)
+                    .extract().path("id").toString();
 
-                Allure.step("Удалить курьера", () -> {
-                    deleteCourier(courierId).statusCode(200);
-                });
-            }
-        });
+            deleteCourier(courierId).statusCode(200);
+        }
+
+    }
+
+    @Step("Создать курьера")
+    private ValidatableResponse postCreateCourier(Courier courier) {
+        return new CourierMethods().postCreateCourier(courier);
+    }
+
+    @Step("Получить id курьера")
+    private ValidatableResponse getCourierId(CourierLogin courierLogin) {
+        return CourierMethods.postCourierLogin(courierLogin);
+    }
+
+    @Step("Удалить курьера")
+    private ValidatableResponse deleteCourier(String id) {
+
+        return CourierMethods.deleteCourier(id);
     }
 
 }

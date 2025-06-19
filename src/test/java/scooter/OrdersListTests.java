@@ -2,6 +2,7 @@ package scooter;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Step;
+import io.qameta.allure.junit4.DisplayName;
 import io.restassured.response.ValidatableResponse;
 import org.junit.After;
 import org.junit.Before;
@@ -24,7 +25,7 @@ public class OrdersListTests extends SetUp {
     private String track;
 
     @Before
-    @Description("Лист заказов.Предусловия для выполнения теста.Создать курьера.Авторизоваться.Создать заказ.Принять заказ")
+    @Description("Предусловия для выполнения теста.Создать курьера.Авторизоваться.Создать заказ.Принять заказ")
     public void setUp() {
         postCreateCourier();
 
@@ -38,7 +39,8 @@ public class OrdersListTests extends SetUp {
     }
 
     @Test
-    @Description("Лист заказов.Получить лист заказов курьера")
+    @DisplayName("Получение листа заказов курьера")
+    @Description("Получить лист заказов по id курьера")
     public void ordersListTest() {
         getOrdersList()
                 .statusCode(200)
@@ -46,59 +48,51 @@ public class OrdersListTests extends SetUp {
     }
 
     @After
-    @Description("Лист заказов.Постусловие для теста.Завершить заказ.Удалить курьера")
+    @Description("Постусловие.Завершить заказ.Удалить курьера")
     public void cleanUp() {
         putFinishOrder();
         deleteCourier();
     }
 
-    @Step
-    @Description("Создать курьера")
+    @Step("Создать курьера")
     public void postCreateCourier() {
         courier = new CourierData().getCourierData("courierAllData");
         new CourierMethods().postCreateCourier(courier);
     }
 
-    @Step
-    @Description("Авторизовать курьера")
+    @Step("Авторизовать курьера")
     public void postCourierLogin() {
         CourierLogin courierLogin = new CourierLogin(courier.getLogin(), courier.getPassword());
         courierId = CourierMethods.postCourierLogin(courierLogin).extract().path("id").toString();
     }
 
-    @Step
-    @Description("Создать заказ")
+    @Step("Создать заказ")
     public void postCreateOrder() {
         Orders order = OrdersData.getOrderData(new ArrayList<>());
         track = OrdersMethods.postCreateOrders(order).extract().path("track").toString();
     }
 
-    @Step
-    @Description("Получить id заказа")
+    @Step("Получить id заказа")
     public void getOrderInfo() {
         orderId = OrdersMethods.getOrderInfo(track).extract().path("order.id").toString();
     }
 
-    @Step
-    @Description("Принять заказ")
+    @Step("Принять заказ")
     public void orderAccept() {
         OrdersMethods.putOrdersAccept(orderId, courierId);
     }
 
-    @Step
-    @Description("Получить лист заказов")
+    @Step("Получить лист заказов")
     public ValidatableResponse getOrdersList() {
         return OrdersMethods.getOrderList(courierId);
     }
 
-    @Step
-    @Description("Завершить заказ")
+    @Step("Завершить заказ")
     public void putFinishOrder() {
         OrdersMethods.finishOrder(orderId).statusCode(200);
     }
 
-    @Step
-    @Description("Удалить курьера")
+    @Step("Удалить курьера")
     public void deleteCourier() {
         CourierMethods.deleteCourier(courierId).statusCode(200);
     }
