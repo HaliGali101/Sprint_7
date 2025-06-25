@@ -1,0 +1,55 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "orders": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "courierId": { "type": "integer" },
+          "firstName": { "type": "string" },
+          "lastName": { "type": "string" },
+          "address": { "type": "string" },
+          "metroStation": { "type": "string" },
+          "phone": { "type": "string" },
+          "rentTime": { "type": "integer", "minimum": 1 },
+          "deliveryDate": { "type": "string", "format": "date-time" },
+          "track": { "type": "integer" },
+          "color": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "comment": { "type": "string" },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "updatedAt": { "type": "string", "format": "date-time" },
+          "status": { "type": "integer" }
+        },
+        "required": ["id", "courierId", "firstName", "lastName", "address", "phone", "status"]
+      }
+    },
+    "pageInfo": {
+      "type": "object",
+      "properties": {
+        "page": { "type": "integer", "minimum": 0 },
+        "total": { "type": "integer", "minimum": 0 },
+        "limit": { "type": "integer", "minimum": 1 }
+      },
+      "required": ["page", "total", "limit"]
+    },
+    "availableStations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string" },
+          "number": { "type": "string" },
+          "color": { "type": "string" }
+        },
+        "required": ["name", "number"]
+      }
+    }
+  },
+  "required": ["orders", "pageInfo"]
+}

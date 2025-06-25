@@ -15,7 +15,7 @@ import scooter.testData.OrdersData;
 
 import java.util.ArrayList;
 
-import static org.hamcrest.Matchers.notNullValue;
+import static io.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchemaInClasspath;
 
 public class OrdersListTests extends SetUp {
 
@@ -44,7 +44,7 @@ public class OrdersListTests extends SetUp {
     public void ordersListTest() {
         getOrdersList()
                 .statusCode(200)
-                .assertThat().body("orders", notNullValue());
+                .assertThat().body(matchesJsonSchemaInClasspath("schemas/orderListJsonSchema.json"));
     }
 
     @After
