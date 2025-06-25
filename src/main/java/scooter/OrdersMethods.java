@@ -60,4 +60,15 @@ public class OrdersMethods {
                 .then()
                 .log().all();
     }
+
+    public static ValidatableResponse putOrdersCancel(String track) {
+        return baseSpec
+                .header("Content-type", "application/json")
+                .queryParams("track", track)
+                .when()
+                .log().all()
+                .put("/api/v1/orders/cancel")
+                .then()
+                .log().all();
+    }
 }

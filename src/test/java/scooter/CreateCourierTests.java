@@ -1,13 +1,11 @@
 package scooter;
 
 import io.qameta.allure.Description;
-import io.qameta.allure.Step;
 import io.qameta.allure.junit4.DisplayName;
-import io.restassured.response.ValidatableResponse;
 import org.junit.After;
 import org.junit.Test;
 import scooter.pojo.Courier;
-import scooter.pojo.CourierLogin;
+import scooter.steps.CourierSteps;
 import scooter.testData.CourierData;
 
 import static org.hamcrest.Matchers.equalTo;
@@ -25,7 +23,7 @@ public class CreateCourierTests extends SetUp {
 
         courier = new CourierData().getCourierData("courierAllData");
 
-        postCreateCourier(courier)
+        CourierSteps.postCreateCourier(courier)
                 .statusCode(201)
                 .assertThat().body("ok", equalTo(true));
 
@@ -39,7 +37,7 @@ public class CreateCourierTests extends SetUp {
 
         courier = new CourierData().getCourierData("courierWithoutLogin");
 
-        postCreateCourier(courier)
+        CourierSteps.postCreateCourier(courier)
                 .statusCode(400)
                 .assertThat().body("code", equalTo(400))
                 .assertThat().body("message", equalTo("Недостаточно данных для создания учетной записи"));
@@ -54,7 +52,7 @@ public class CreateCourierTests extends SetUp {
 
         courier = new CourierData().getCourierData("courierWithoutPassword");
 
-        postCreateCourier(courier)
+        CourierSteps.postCreateCourier(courier)
                 .statusCode(400)
                 .assertThat().body("code", equalTo(400))
                 .assertThat().body("message", equalTo("Недостаточно данных для создания учетной записи"));
@@ -69,7 +67,7 @@ public class CreateCourierTests extends SetUp {
 
         courier = new CourierData().getCourierData("courierWithoutFirstName");
 
-        postCreateCourier(courier)
+        CourierSteps.postCreateCourier(courier)
                 .statusCode(201)
                 .assertThat().body("ok", equalTo(true));
 
@@ -83,7 +81,7 @@ public class CreateCourierTests extends SetUp {
 
         courier = new CourierData().getCourierData("courierWithoutFirstName");
 
-        postCreateCourier(courier)
+        CourierSteps.postCreateCourier(courier)
                 .statusCode(201)
                 .assertThat().body("ok", equalTo(true));
 
@@ -98,31 +96,12 @@ public class CreateCourierTests extends SetUp {
     @DisplayName("Постусловие")
     public void cleanUp() {
         if (isCreated) {
-            CourierLogin courierLogin = new CourierLogin(courier.getLogin(), courier.getPassword());
-
-            courierId = getCourierId(courierLogin)
+            courierId = CourierSteps.postCourierLogin(courier, "allData")
                     .statusCode(200)
                     .extract().path("id").toString();
 
-            deleteCourier(courierId).statusCode(200);
+            CourierSteps.deleteCourier(courierId).statusCode(200);
         }
-
-    }
-
-    @Step("Создать курьера")
-    private ValidatableResponse postCreateCourier(Courier courier) {
-        return new CourierMethods().postCreateCourier(courier);
-    }
-
-    @Step("Получить id курьера")
-    private ValidatableResponse getCourierId(CourierLogin courierLogin) {
-        return CourierMethods.postCourierLogin(courierLogin);
-    }
-
-    @Step("Удалить курьера")
-    private ValidatableResponse deleteCourier(String id) {
-
-        return CourierMethods.deleteCourier(id);
     }
 
 }

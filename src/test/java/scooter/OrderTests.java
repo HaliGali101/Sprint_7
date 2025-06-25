@@ -1,15 +1,13 @@
 package scooter;
 
 import io.qameta.allure.Description;
-import io.qameta.allure.Step;
 import io.qameta.allure.junit4.DisplayName;
 import io.restassured.response.ValidatableResponse;
 import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-import scooter.pojo.Orders;
-import scooter.testData.OrdersData;
+import scooter.steps.OrdersSteps;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,7 +28,6 @@ public class OrderTests extends SetUp {
         this.statusCode = statusCode;
     }
 
-
     @Parameterized.Parameters
     public static Object[][] setUp() {
         return new Object[][] {
@@ -42,10 +39,10 @@ public class OrderTests extends SetUp {
     }
 
     @Test
-    @DisplayName("Создание заказа.Чёрный цвет")
-    @Description("Создать заказ с чёрным цветом самоката")
-    public void createOrderWithBlackColor() {
-        ValidatableResponse response = createOrder(colorsArray)
+    @DisplayName("Создание заказа")
+    @Description("Создать заказ с цветом самоката")
+    public void createOrderParametersTest() {
+        ValidatableResponse response = OrdersSteps.postCreateOrder(colorsArray)
                 .statusCode(statusCode)
                 .assertThat().body("track", notNullValue());
 
@@ -55,19 +52,7 @@ public class OrderTests extends SetUp {
     @After
     @Description("Постусловие.Завершить заказ")
     public void cleanUp() {
-        finishOrder();
-    }
-
-    @Step("Создать заказ")
-    private ValidatableResponse createOrder(ArrayList<String> colorConfig) {
-        Orders order = OrdersData.getOrderData(colorConfig);
-        return OrdersMethods.postCreateOrders(order);
-    }
-
-    @Step("Завершить заказ")
-    private void finishOrder() {
-        String orderId = OrdersMethods.getOrderInfo(track).statusCode(200).extract().path("order.id").toString();
-        OrdersMethods.finishOrder(orderId);
+        OrdersSteps.putOrdersCancel(track).statusCode(200);
     }
 
 }
