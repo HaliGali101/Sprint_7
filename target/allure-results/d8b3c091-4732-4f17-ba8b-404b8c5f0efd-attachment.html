@@ -1,0 +1,46 @@
+<div>POST to https://qa-scooter.praktikum-services.ru/api/v1/orders</div>
+
+<h4>Body</h4>
+<div>
+    <pre class="preformated-text">
+{
+    &quot;firstName&quot;: &quot;Stephania&quot;,
+    &quot;lastName&quot;: &quot;O&#39;Hara&quot;,
+    &quot;address&quot;: &quot;Apt. 290 386 Mei Cliff, South Stepanie, TX 26896&quot;,
+    &quot;metroStation&quot;: 4,
+    &quot;phone&quot;: &quot;(625) 894-2059 x17339&quot;,
+    &quot;rentTime&quot;: 11,
+    &quot;deliveryDate&quot;: &quot;2025-07-16&quot;,
+    &quot;comment&quot;: &quot;Unde ratione qui ullam ullam.&quot;,
+    &quot;color&quot;: [
+        &quot;BLACK&quot;,
+        &quot;GRAY&quot;
+    ]
+}    </pre>
+</div>
+
+<h4>Headers</h4>
+<div>
+        <div>Accept: */*</div>
+        <div>Content-Type: application/json</div>
+</div>
+
+
+
+<h4>Curl</h4>
+<div>
+curl -v -X POST &#39;https://qa-scooter.praktikum-services.ru/api/v1/orders&#39; -H &#39;Accept: */*&#39; -H &#39;Content-Type: application/json&#39; -d &#39;{
+    &quot;firstName&quot;: &quot;Stephania&quot;,
+    &quot;lastName&quot;: &quot;O&#39;Hara&quot;,
+    &quot;address&quot;: &quot;Apt. 290 386 Mei Cliff, South Stepanie, TX 26896&quot;,
+    &quot;metroStation&quot;: 4,
+    &quot;phone&quot;: &quot;(625) 894-2059 x17339&quot;,
+    &quot;rentTime&quot;: 11,
+    &quot;deliveryDate&quot;: &quot;2025-07-16&quot;,
+    &quot;comment&quot;: &quot;Unde ratione qui ullam ullam.&quot;,
+    &quot;color&quot;: [
+        &quot;BLACK&quot;,
+        &quot;GRAY&quot;
+    ]
+}&#39;
+</div>
